@@ -15,33 +15,22 @@ class Name(Field):
     pass
 
 
-class DateNotValid(Exception):
-    pass
-
-
 class Birthday(Field):
     def __init__(self, value):
         pattern = r"^\d{2}\.\d{2}\.\d{4}$"
-        self.value = value if re.match(pattern, value) else None
-        try:
-            if self.value is None:
-                raise DateNotValid
-        except DateNotValid:
+        if not re.match(pattern, value):
             print("Неправильний формат дати, має бути - DD.MM.YYYY")
-
-
-class PhoneNotValid(Exception):
-    pass
+            raise ValueError()
+        self.value = value
 
 
 class Phone(Field):
     def __init__(self, value):
-        self.value = value if len(value) == 10 else None
-        try:
-            if self.value is None:
-                raise PhoneNotValid
-        except PhoneNotValid:
+        if len(value) == 10:
+            self.value = value
+        else:
             print("Номер телефону не є дійсним")
+            raise ValueError()
 
 
 class Record:
@@ -119,7 +108,7 @@ def input_error(func):
         try:
             return func(*args, **kwargs)
         except ValueError:
-            return "Give me name and(or) phone please."
+            return "Incorrect value"
         except IndexError:
             return "Give me a name"
         except KeyError:
